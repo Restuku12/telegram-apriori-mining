@@ -258,9 +258,11 @@ async def input_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def input_ask(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text.strip()
+
     if not is_int_nonneg(text):
         await update.message.reply_text("❌ Masukkan angka bulat ≥0!")
         return ASKING
+
     value = int(text)
     fields = [k for g in GROUPS for k in g]
     idx = context.user_data.get("idx", 0)
@@ -277,7 +279,6 @@ async def input_ask(update: Update, context: ContextTypes.DEFAULT_TYPE):
         next_key = fields[idx]
         await update.message.reply_text(FIELD_PROMPTS[next_key])
         return ASKING
-
 
     # validasi grup
     cumulative = 0
