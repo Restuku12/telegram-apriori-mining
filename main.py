@@ -358,19 +358,50 @@ async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
     d = ensure_data(context)
     args = context.args
     target = args[0].upper() if args else "PJO1"
+
     if target not in d or target == "TOTAL":
-        await update.message.reply_text(f"❌ Target tidak valid, gunakan kode dari item selain TOTAL. Contoh: /rules PJO1")
+        await update.message.reply_text("❌ Target tidak valid. Contoh: /rules PJO1")
         return
+
     freq_itemsets = apriori(d, 5)
     rules = generate_rules(freq_itemsets, d, target)
+
     if not rules:
         await update.message.reply_text(f"📊 Tidak ditemukan aturan asosiasi untuk target {target} dengan confidence ≥80%.")
         return
-    text_rules = "\n".join([
+
+    # =======================
+    # Export ke TXT
+    # =======================
+    text_rules = "\n\n".join([
         f"Jika {r[0]} → Maka {r[1]} (Support={r[2]:.2f}, Confidence={r[3]:.2f})\n{interpret_rule(r[0], r[1], r[2], r[3])}"
         for r in rules
     ])
-    await update.message.reply_text(f"📊 Rule Mining untuk target {ITEM_LABELS.get(target,target)}:\n{text_rules}")
+    export_text("rules.txt", f"📊 Rules untuk target {ITEM_LABELS.get(target, target)}:\n\n{text_rules}")
+
+    # =======================
+    # Export ke CSV
+    # =======================
+    csv_rows = [[r[0], r[1], f"{r[2]:.4f}", f"{r[3]:.4f}"] for r in rules]
+    export_rows_to_csv("rules.csv", ["Antecedent", "Consequent", "Support", "Confidence"], csv_rows)
+
+    # =======================
+    # Kirim sebagian ke chat
+    # =======================
+    preview_rules = rules[:10]  # maksimal 10 aturan ditampilkan langsung
+    preview_text = "\n\n".join([
+        f"Jika {r[0]} → Maka {r[1]} (Support={r[2]:.2f}, Confidence={r[3]:.2f})"
+        for r in preview_rules
+    ])
+    if len(rules) > 10:
+        preview_text += f"\n\n📄 {len(rules) - 10} aturan lainnya ada di file terlampir."
+
+    await update.message.reply_text(f"📊 Aturan Asosiasi untuk {ITEM_LABELS.get(target, target)}:\n\n{preview_text}")
+
+    await update.message.reply_document(open("rules.txt", "rb"))
+    await update.message.reply_document(open("rules.csv", "rb"))
+
+
 
 # =========================
 # MAIN
