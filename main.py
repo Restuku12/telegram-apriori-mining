@@ -265,7 +265,9 @@ async def input_ask(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fields = [k for g in GROUPS for k in g]
     idx = context.user_data.get("idx", 0)
     key = fields[idx]
-    context.user_data["data"][key] = valueasync def input_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    context.user_data["data"][key] = value
+    
+    async def input_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data.clear()
     context.user_data["idx"]=0
     context.user_data["data"]={}
