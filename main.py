@@ -267,25 +267,30 @@ async def input_ask(update: Update, context: ContextTypes.DEFAULT_TYPE):
     key = fields[idx]
     context.user_data["data"][key] = value
     
-    async def input_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    context.user_data.clear()
-    context.user_data["idx"]=0
-    context.user_data["data"]={}
-    fields=[k for g in GROUPS for k in g]
-    await update.message.reply_text("📝 Mulai input data step-by-step.\nKetik angka ≥0")
-    await update.message.reply_text(FIELD_PROMPTS[fields[0]])
-    return ASKING
+   async def input_ask(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    text = update.message.text.strip()
 
-async def input_ask(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    text=update.message.text.strip()
     if not is_int_nonneg(text):
         await update.message.reply_text("❌ Masukkan angka bulat ≥0!")
         return ASKING
-    value=int(text)
-    fields=[k for g in GROUPS for k in g]
-    idx=context.user_data.get("idx",0)
-    key=fields[idx]
-    context.user_data["data"][key]=value
+
+    value = int(text)
+    fields = [k for g in GROUPS for k in g]
+    idx = context.user_data.get("idx", 0)
+    key = fields[idx]
+    context.user_data["data"][key] = value
+
+    # Cek apakah masih ada field selanjutnya
+    idx += 1
+    if idx >= len(fields):
+        await update.message.reply_text("✅ Input selesai! Ketik /rekap untuk lihat hasil.")
+        return ConversationHandler.END
+    else:
+        context.user_data["idx"] = idx
+        next_key = fields[idx]
+        await update.message.reply_text(FIELD_PROMPTS[next_key])
+        return ASKING
+
 
     # validasi grup
     cumulative = 0
