@@ -100,14 +100,15 @@ def validate_group(data: Dict[str, int], group_idx: int) -> Tuple[bool, str]:
     return True, ""
 
 def clear_group(user_data: dict, group_idx: int):
-    for k in GROUPS[group_idx]:
-        user_data.pop(k, None)
+    for k in GROUPS[group_idx]: user_data.pop(k, None)
 
 def group_start_index(group_idx: int) -> int:
     idx = 0
     for i in range(group_idx):
         idx += len(GROUPS[i])
-    return idx  # =========================
+    return idx  
+    
+# =========================
 # FORMAT REKAP
 # =========================
 def format_rekap_text(d: Dict[str, int]) -> str:
@@ -173,6 +174,8 @@ def apriori(data: Dict[str, int], k: int) -> List[Tuple[Tuple[str, ...], int, fl
     prev_freq = [x[0] for x in prev]
     candidates = apriori_generate_candidates(prev_freq, k)
     return k_itemset_from_candidates(data, candidates, min_support)
+
+
 # =========================
 # RULE MINING (Pola Asosiasi)
 # =========================
@@ -201,6 +204,8 @@ def interpret_rule(antecedent: str, consequent: str, support: float, confidence:
         f"📘 Jika seseorang memiliki karakteristik: {antecedent}, maka kemungkinan besar mereka juga memiliki karakteristik {consequent}. "
         f"(Support: {support * 100:.2f}%, Confidence: {confidence * 100:.2f}%)"
     )
+
+
 # =========================
 # HANDLER UTAMA
 # =========================
@@ -241,6 +246,7 @@ async def rekap(update: Update, context: ContextTypes.DEFAULT_TYPE):
     rows = rekap_rows_csv(d)
     export_rows_to_csv("rekap.csv", ["Item", "Jumlah"], rows)
     await update.message.reply_document(open("rekap.csv", "rb"))
+    
 async def input_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data.clear()
     context.user_data["idx"] = 0
@@ -259,7 +265,25 @@ async def input_ask(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fields = [k for g in GROUPS for k in g]
     idx = context.user_data.get("idx", 0)
     key = fields[idx]
-    context.user_data["data"][key] = value
+    context.user_data["data"][key] = valueasync def input_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    context.user_data.clear()
+    context.user_data["idx"]=0
+    context.user_data["data"]={}
+    fields=[k for g in GROUPS for k in g]
+    await update.message.reply_text("📝 Mulai input data step-by-step.\nKetik angka ≥0")
+    await update.message.reply_text(FIELD_PROMPTS[fields[0]])
+    return ASKING
+
+async def input_ask(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    text=update.message.text.strip()
+    if not is_int_nonneg(text):
+        await update.message.reply_text("❌ Masukkan angka bulat ≥0!")
+        return ASKING
+    value=int(text)
+    fields=[k for g in GROUPS for k in g]
+    idx=context.user_data.get("idx",0)
+    key=fields[idx]
+    context.user_data["data"][key]=value
 
     # validasi grup
     cumulative = 0
