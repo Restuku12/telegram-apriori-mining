@@ -68,7 +68,7 @@ DETAILED_LABELS = {
     "ABJ2": "❗ Masalah Keuangan dalam Pernikahan (ABJ2): {ABJ2}",
     "ABJ3": "🗣️ Pertengkaran/Komunikasi yang Buruk (ABJ3): {ABJ3}",
     "ABJ4": "⚠ Konflik dan Kekerasan dalam Pernikahan (ABJ4): {ABJ4}",
-    "ABJ5": "🕵 Pemantauan dan Konseling Pernikahan (ABJ5): {ABJ5}",
+    "ABJ5": "🕵 Ketidakjujuran Pasangan Akibat Judi Online (ABJ5): {ABJ5}",
 }
 
 
