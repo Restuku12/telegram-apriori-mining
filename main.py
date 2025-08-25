@@ -30,6 +30,50 @@ GROUPS = [
     ("ABJ1", "ABJ2", "ABJ3", "ABJ4", "ABJ5"),
 ]
 
+DETAILED_LABELS = {
+    "JK1": "👩 Jumlah Perempuan (JK1): {JK1}",
+    "JK2": "👨 Jumlah Laki-Laki (JK2): {JK2}",
+    "UMR1": "🎂 Jumlah usia < 20 Tahun (UMR1): {UMR1}",
+    "UMR2": "🧑‍💼 Jumlah usia 20-30 Tahun (UMR2): {UMR2}",
+    "UMR3": "👨‍👩‍👧‍👦 Jumlah usia 31-40 Tahun (UMR3): {UMR3}",
+    "UMR4": "👴 Jumlah usia 41-50 Tahun (UMR4): {UMR4}",
+    "UMR5": "👵 Jumlah usia > 50 Tahun (UMR5): {UMR5}",
+    "PT1": "📚 Tamatan SD/Sederajat (PT1): {PT1}",
+    "PT2": "🏫 Tamatan SMP/Sederajat (PT2): {PT2}",
+    "PT3": "🎓 Tamatan SMA/Sederajat (PT3): {PT3}",
+    "PT4": "🎓🎓 Tamatan Diploma/Sarjana (PT4): {PT4}",
+    "FBJ1": "📅🔥 Frekuensi Bermain Hampir Setiap Hari (FBJ1): {FBJ1}",
+    "FBJ2": "📅 Frekuensi Bermain 2-3 kali/minggu (FBJ2): {FBJ2}",
+    "FBJ3": "📆 Frekuensi Bermain 1 kali/minggu (FBJ3): {FBJ3}",
+    "FBJ4": "⏳ Frekuensi Bermain <1 kali/minggu (FBJ4): {FBJ4}",
+    "JJ1": "🎲 Jenis Judi Togel/Lotere Online (JJ1): {JJ1}",
+    "JJ2": "⚽ Jenis Judi Taruhan Olahraga (JJ2): {JJ2}",
+    "JJ3": "🃏 Jenis Judi Kasino Online (JJ3): {JJ3}",
+    "JJ4": "❓ Jenis Judi Lainnya (JJ4): {JJ4}",
+    "PDB1": "💸 Pengeluaran < Rp 500Rb (PDB1): {PDB1}",
+    "PDB2": "💰 Pengeluaran Rp 500Rb - Rp 2 Jt (PDB2): {PDB2}",
+    "PDB3": "💵 Pengeluaran 2 Jt - 5 Jt (PDB3): {PDB3}",
+    "PDB4": "🏦 Pengeluaran > Rp 5 Jt (PDB4): {PDB4}",
+    "MK1": "❗ Masalah Keuangan YA (MK1): {MK1}",
+    "MK2": "✔️ Masalah Keuangan TIDAK (MK2): {MK2}",
+    "FB1": "🙅‍♂️ Frekuensi Bertengkar Tidak Pernah (FB1): {FB1}",
+    "FB2": "🤏 Frekuensi Bertengkar Jarang 1-2 Kali/bln (FB2): {FB2}",
+    "FB3": "🔥 Frekuensi Bertengkar Sering 1-2 Kali/bln (FB3): {FB3}",
+    "FB4": "💥 Frekuensi Bertengkar Hampir Setiap Hari (FB4): {FB4}",
+    "KJO1": "🎰❗ Kecanduan Judi Online YA (KJO1): {KJO1}",
+    "KJO2": "✔️ Kecanduan Judi Online TIDAK (KJO2): {KJO2}",
+    "PJO1": "💔 Perceraian YA (PJO1): {PJO1}",
+    "PJO2": "💖 Perceraian TIDAK (PJO2): {PJO2}",
+    "ABJ1": "🎰 Kecanduan Bermain Judi Online (ABJ1): {ABJ1}",
+    "ABJ2": "❗ Masalah Keuangan dalam Pernikahan (ABJ2): {ABJ2}",
+    "ABJ3": "🗣️ Pertengkaran/Komunikasi yang Buruk (ABJ3): {ABJ3}",
+    "ABJ4": "⚠ Konflik dan Kekerasan dalam Pernikahan (ABJ4): {ABJ4}",
+    "ABJ5": "🕵 Pemantauan dan Konseling Pernikahan (ABJ5): {ABJ5}",
+}
+
+
+
+
 ITEM_LABELS = {
     "JK1": "👩 JK1", "JK2": "👨 JK2",
     "UMR1": "🧒 UMR1", "UMR2": "👦 UMR2", "UMR3": "👧 UMR3", "UMR4": "🧑 UMR4", "UMR5": "🧓 UMR5",
@@ -111,11 +155,18 @@ def group_start_index(group_idx: int) -> int:
 # =========================
 # FORMAT REKAP
 # =========================
-def format_rekap_text(d: Dict[str, int]) -> str:
+def format_rekap_text(data: dict) -> str:
     text = "📊 Rekap Data:\n\n"
-    for g in GROUPS[1:]:
-        for k in g:
-            text += f"{ITEM_LABELS[k]}: {d.get(k, 0)}\n"
+    for group in GROUPS:
+        for key in group:
+            if key in DETAILED_LABELS:
+                try:
+                    text += DETAILED_LABELS[key].format(**data) + "\n"
+                except KeyError:
+                    text += f"{key}: Data tidak tersedia\n"
+            else:
+                text += f"{key}: {data.get(key, 'Data tidak tersedia')}\n"
+        text += "\n"  # spasi antar grup
     return text
 
 def rekap_rows_csv(d: Dict[str, int]) -> List[List[str]]:
